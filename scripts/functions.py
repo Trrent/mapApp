@@ -43,7 +43,8 @@ def get_image(coords: str, zoom=None, layers='map', points=None):
     static_map_url = 'http://static-maps.yandex.ru/1.x/'
     params = {'ll': coords.replace(' ', ','),
               'pt': '~'.join(points),
-              'l': layers}
+              'l': layers,
+              'size': '650,450'}
     if zoom is None:
         params['spn'] = get_spn(coords)
     else:
