@@ -9,6 +9,16 @@ def check_response(response):
         exit()
 
 
+def check_coordinates(coord: float, delta: float, direction: str):
+    if direction == 'x':
+        if coord + delta > 180 or coord + delta < -180:
+            return coord
+    elif direction == 'y':
+        if coord + delta > 90 or coord + delta < -90:
+            return coord
+    return coord + delta
+
+
 def get_coords(place: str):
     geocode_url = "https://geocode-maps.yandex.ru/1.x/"
     params = {"apikey": "40d1649f-0493-4b70-98ba-98533de7710b",
