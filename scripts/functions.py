@@ -9,14 +9,14 @@ def check_response(response):
         exit()
 
 
-def check_coordinates(coord: float, direction: str):
+def check_coordinates(coord: float, delta:float, direction: str):
     if direction == 'x':
-        if coord > 180 or coord < -180:
-            return 0
+        if coord + delta > 180 or coord + delta < -180:
+            return coord
     elif direction == 'y':
-        if coord > 90 or coord < -90:
-            return 0
-    return coord
+        if coord + delta > 90 or coord + delta < -90:
+            return coord
+    return coord + delta
 
 
 def get_coords(place: str):

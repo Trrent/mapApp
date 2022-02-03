@@ -18,13 +18,13 @@ class Window(QWidget, WindowForm):
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Up:
-            self.cur_coords[1] = check_coordinates(self.cur_coords[1] + 0.00266 * 2 ** (17 - self.zoom), 'y')
+            self.cur_coords[1] = check_coordinates(self.cur_coords[1], 0.00266 * 2 ** (17 - self.zoom), 'y')
         if event.key() == Qt.Key_Down:
-            self.cur_coords[1] = check_coordinates(self.cur_coords[1] - 0.00266 * 2 ** (17 - self.zoom), 'y')
+            self.cur_coords[1] = check_coordinates(self.cur_coords[1], -0.00266 * 2 ** (17 - self.zoom), 'y')
         if event.key() == Qt.Key_Right:
-            self.cur_coords[0] = check_coordinates(self.cur_coords[0] + 0.00693 * 2 ** (17 - self.zoom), 'x')
+            self.cur_coords[0] = check_coordinates(self.cur_coords[0], 0.00693 * 2 ** (17 - self.zoom), 'x')
         if event.key() == Qt.Key_Left:
-            self.cur_coords[0] = check_coordinates(self.cur_coords[0] - 0.00693 * 2 ** (17 - self.zoom), 'x')
+            self.cur_coords[0] = check_coordinates(self.cur_coords[0], -0.00693 * 2 ** (17 - self.zoom), 'x')
         if event.key() == Qt.Key_PageUp and self.zoom < 17:
             self.zoom += 1
             if self.zoom == 2:
