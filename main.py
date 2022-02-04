@@ -10,10 +10,15 @@ class Window(QWidget, WindowForm):
     def __init__(self):
         super().__init__()
         self.setGeometry(500, 250, *SCREEN_SIZE)
-        self.object_coords = [37.530887, 55.70311]  # Координаты текущего объекта
-        self.cur_coords = self.object_coords  # Текущие координаты
+        self.object_coords = [37.530887, 55.70311]
+        self.cur_coords = self.object_coords
         self.zoom = 17
+        self.view = 'map'
         self.setupUi(self)
+        self.view_show.clicked.connect(self.negative_views)
+        self.view_map.clicked.connect(self.set_view_map)
+        self.view_sat.clicked.connect(self.set_view_sat)
+        self.view_satskl.clicked.connect(self.set_view_satskl)
         self.updateMap()
 
     def keyPressEvent(self, event):
@@ -37,9 +42,34 @@ class Window(QWidget, WindowForm):
         self.updateMap()
 
     def updateMap(self):
-        map_img = QByteArray(get_image(' '.join(map(str, self.cur_coords)), self.zoom))
+        map_img = QByteArray(get_image(' '.join(map(str, self.cur_coords)), self.zoom, self.view))
         self.pixmap.loadFromData(map_img)
         self.image.setPixmap(self.pixmap)
+
+    def negative_views(self):
+        if self.view_map.isHidden():
+            self.view_map.show()
+            self.view_sat.show()
+            self.view_satskl.show()
+        else:
+            self.view_map.hide()
+            self.view_sat.hide()
+            self.view_satskl.hide()
+
+    def set_view_map(self):
+        self.view = 'map'
+        self.updateMap()
+        self.negative_views()
+
+    def set_view_sat(self):
+        self.view = 'sat'
+        self.updateMap()
+        self.negative_views()
+
+    def set_view_satskl(self):
+        self.view = 'sat,skl'
+        self.updateMap()
+        self.negative_views()
 
 
 if __name__ == '__main__':
