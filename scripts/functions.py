@@ -9,7 +9,7 @@ def check_response(response):
         exit()
 
 
-def check_coordinates(coord: float, delta:float, direction: str):
+def check_coordinates(coord: float, delta: float, direction: str):
     if direction == 'x':
         if coord + delta > 180 or coord + delta < -180:
             return coord

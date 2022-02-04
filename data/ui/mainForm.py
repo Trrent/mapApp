@@ -1,4 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+from pathlib import Path
+
+imagesPath = Path(Path(__file__).parent.parent, 'image')
 
 
 class WindowForm(object):
@@ -10,6 +13,21 @@ class WindowForm(object):
         MainWindow.image = QtWidgets.QLabel(MainWindow)
         MainWindow.image.move(0, 0)
         MainWindow.image.resize(650, 450)
+
+        MainWindow.searchLine = ClickableLine(MainWindow)
+        MainWindow.searchLine.setReadOnly(True)
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        MainWindow.searchLine.setFont(font)
+        MainWindow.searchLine.setMaxLength(60)
+        MainWindow.searchLine.move(25, 10)
+        MainWindow.searchLine.resize(500, 30)
+
+        MainWindow.searchButton = QtWidgets.QPushButton('Поиск', MainWindow)
+        MainWindow.searchButton.setGeometry(525, 10, 60, 31)
+
+        MainWindow.clearButton = QtWidgets.QPushButton('Стереть', MainWindow)
+        MainWindow.clearButton.setGeometry(585, 10, 60, 31)
 
         # Вид карты (Схема/Спутник/Гибрид)
         # Кнопка "Вид"
@@ -43,3 +61,24 @@ class WindowForm(object):
         MainWindow.view_satskl.setStyleSheet('background-color: #ffcc00')
         MainWindow.view_satskl.setFocusPolicy(QtCore.Qt.NoFocus)
         MainWindow.view_satskl.hide()
+
+
+class ClickableLine(QtWidgets.QLineEdit):
+    clicked = QtCore.pyqtSignal()
+
+    def __init__(self, parent):
+        super(ClickableLine, self).__init__(parent)
+        self.parent = parent
+
+    def mouseReleaseEvent(self, e):
+        if self.isReadOnly():
+            self.setReadOnly(False)
+        else:
+            self.setReadOnly(True)
+        self.clicked.emit()
+
+    def keyPressEvent(self, event):
+        if self.isReadOnly():
+            self.parent.keyPressEvent(event)
+        else:
+            super(ClickableLine, self).keyPressEvent(event)

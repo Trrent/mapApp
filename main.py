@@ -9,17 +9,31 @@ from PyQt5.QtCore import Qt, QByteArray
 class Window(QWidget, WindowForm):
     def __init__(self):
         super().__init__()
-        self.setGeometry(500, 250, *SCREEN_SIZE)
+
+        self.setFixedSize(*SCREEN_SIZE)
         self.object_coords = [37.530887, 55.70311]
         self.cur_coords = self.object_coords
         self.zoom = 17
+        self.points = None
         self.view = 'map'
         self.setupUi(self)
         self.view_show.clicked.connect(self.negative_views)
         self.view_map.clicked.connect(self.set_view_map)
         self.view_sat.clicked.connect(self.set_view_sat)
         self.view_satskl.clicked.connect(self.set_view_satskl)
+        self.searchButton.clicked.connect(self.search)
+        self.clearButton.clicked.connect(self.searchLine.clear)
+
         self.updateMap()
+
+    def search(self):
+        s = self.searchLine.text()
+        if s:
+            coord = get_coords(s)
+            self.object_coords = [float(i) for i in coord.split(',')]
+            self.cur_coords = self.object_coords
+            self.points = [coord + ',pm2rdm']
+            self.updateMap()
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Up:
@@ -42,7 +56,7 @@ class Window(QWidget, WindowForm):
         self.updateMap()
 
     def updateMap(self):
-        map_img = QByteArray(get_image(' '.join(map(str, self.cur_coords)), self.zoom, self.view))
+        map_img = QByteArray(get_image(' '.join(map(str, self.cur_coords)), self.zoom, self.view, points=self.points))
         self.pixmap.loadFromData(map_img)
         self.image.setPixmap(self.pixmap)
 
