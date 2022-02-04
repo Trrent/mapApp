@@ -29,6 +29,10 @@ class WindowForm(object):
         MainWindow.clearButton = QtWidgets.QPushButton('Стереть', MainWindow)
         MainWindow.clearButton.setGeometry(585, 10, 60, 31)
 
+        MainWindow.resetButton = QtWidgets.QPushButton('Сброс', MainWindow)
+        MainWindow.resetButton.setGeometry(585, 41, 60, 31)
+        MainWindow.resetButton.hide()
+
         # Вид карты (Схема/Спутник/Гибрид)
         # Кнопка "Вид"
         MainWindow.view_show = QtWidgets.QPushButton(MainWindow)
