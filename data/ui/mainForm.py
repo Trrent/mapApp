@@ -29,6 +29,10 @@ class WindowForm(object):
         MainWindow.clearButton = QtWidgets.QPushButton('Стереть', MainWindow)
         MainWindow.clearButton.setGeometry(585, 10, 60, 31)
 
+        MainWindow.resetButton = QtWidgets.QPushButton('Сброс', MainWindow)
+        MainWindow.resetButton.setGeometry(585, 41, 60, 31)
+        MainWindow.resetButton.hide()
+
         # Вид карты (Схема/Спутник/Гибрид)
         # Кнопка "Вид"
         MainWindow.view_show = QtWidgets.QPushButton(MainWindow)
@@ -74,7 +78,6 @@ class WindowForm(object):
         MainWindow.text_address.move(655, 40)
         MainWindow.text_address.resize(240, 90)
         MainWindow.text_address.setStyleSheet('background-color: #ffffff')
-        MainWindow.text_address.setText('fhgweirughwehgewqihgfhgweirughwehgewqihgfhgweirughwehgewqihg')
 
 
 class ClickableLine(QtWidgets.QLineEdit):

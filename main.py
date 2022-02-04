@@ -23,7 +23,13 @@ class Window(QWidget, WindowForm):
         self.view_satskl.clicked.connect(self.set_view_satskl)
         self.searchButton.clicked.connect(self.search)
         self.clearButton.clicked.connect(self.searchLine.clear)
+        self.resetButton.clicked.connect(self.reset)
 
+        self.updateMap()
+
+    def reset(self):
+        self.points = None
+        self.text_address.setText('')
         self.updateMap()
 
     def search(self):
@@ -33,6 +39,7 @@ class Window(QWidget, WindowForm):
             self.object_coords = [float(i) for i in coord.split(',')]
             self.cur_coords = self.object_coords
             self.points = [coord + ',pm2rdm']
+            self.resetButton.show()
             self.set_text_address()
             self.updateMap()
 
