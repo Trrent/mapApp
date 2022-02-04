@@ -33,6 +33,7 @@ class Window(QWidget, WindowForm):
             self.object_coords = [float(i) for i in coord.split(',')]
             self.cur_coords = self.object_coords
             self.points = [coord + ',pm2rdm']
+            self.set_text_address()
             self.updateMap()
 
     def keyPressEvent(self, event):
@@ -85,10 +86,12 @@ class Window(QWidget, WindowForm):
         self.updateMap()
         self.negative_views()
 
+    def set_text_address(self):
+        self.text_address.setText(get_address(' '.join(map(str, self.cur_coords))))
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = Window()
     window.show()
     sys.exit(app.exec())
-

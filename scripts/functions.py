@@ -71,3 +71,17 @@ def get_description(place: str):
 
 def get_points(*places):
     return map(get_description, places)
+
+
+def get_address(coords: str):
+    geocode_url = "https://geocode-maps.yandex.ru/1.x/"
+    params = {"apikey": "40d1649f-0493-4b70-98ba-98533de7710b",
+              "geocode": coords.replace(" ", ","),
+              "format": "json"}
+    response = requests.get(geocode_url, params)
+    check_response(response)
+    r = response.json()
+    address = \
+        r["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]["metaDataProperty"]["GeocoderMetaData"][
+            "text"]
+    return address
