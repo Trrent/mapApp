@@ -6,7 +6,6 @@ def check_response(response):
         print("Ошибка выполнения запроса:")
         print(response.url)
         print("Http статус:", response.status_code, "(", response.reason, ")")
-        exit()
 
 
 def check_coordinates(coord: float, delta: float, direction: str):
@@ -25,10 +24,12 @@ def get_coords(place: str):
               "geocode": f"{place}",
               "format": "json"}
     response = requests.get(geocode_url, params)
-    check_response(response)
-    r = response.json()
-    ll = r["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]["Point"]["pos"]
-    return ll.replace(" ", ",")
+    if response:
+        r = response.json()
+        if int(r["response"]["GeoObjectCollection"]['metaDataProperty']['GeocoderResponseMetaData']['found']) > 0:
+            ll = r["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]["Point"]["pos"]
+            return ll.replace(" ", ",")
+    return None
 
 
 def get_spn(coords: str):
@@ -37,14 +38,15 @@ def get_spn(coords: str):
               "geocode": coords.replace(" ", ","),
               "format": "json"}
     response = requests.get(geocode_url, params)
-    check_response(response)
-    r = response.json()
-    envelop = r["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]['boundedBy']['Envelope']
-    lcorner = envelop['lowerCorner'].split()
-    ucorner = envelop['upperCorner'].split()
-    x = float(ucorner[0]) - float(lcorner[0])
-    y = float(ucorner[1]) - float(lcorner[1])
-    return ",".join(map(str, [x, y]))
+    if response:
+        r = response.json()
+        envelop = r["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]['boundedBy']['Envelope']
+        lcorner = envelop['lowerCorner'].split()
+        ucorner = envelop['upperCorner'].split()
+        x = float(ucorner[0]) - float(lcorner[0])
+        y = float(ucorner[1]) - float(lcorner[1])
+        return ",".join(map(str, [x, y]))
+    return None
 
 
 def get_image(coords: str, zoom=None, layers='map', points=None):
@@ -60,8 +62,9 @@ def get_image(coords: str, zoom=None, layers='map', points=None):
     else:
         params['z'] = zoom
     response = requests.get(static_map_url, params)
-    check_response(response)
-    return response.content
+    if response:
+        return response.content
+    return None
 
 
 def get_description(place: str):
@@ -71,3 +74,18 @@ def get_description(place: str):
 
 def get_points(*places):
     return map(get_description, places)
+
+
+def get_address(coords: str):
+    geocode_url = "https://geocode-maps.yandex.ru/1.x/"
+    params = {"apikey": "40d1649f-0493-4b70-98ba-98533de7710b",
+              "geocode": coords.replace(" ", ","),
+              "format": "json"}
+    response = requests.get(geocode_url, params)
+    if response:
+        r = response.json()
+        address = \
+            r["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]["metaDataProperty"]["GeocoderMetaData"][
+                "text"]
+        return address
+    return None

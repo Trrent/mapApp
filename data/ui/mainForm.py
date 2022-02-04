@@ -7,7 +7,7 @@ imagesPath = Path(Path(__file__).parent.parent, 'image')
 class WindowForm(object):
     def setupUi(self, MainWindow):
         MainWindow.setWindowTitle('Карты')
-        MainWindow.setFixedSize(650, 450)
+        MainWindow.setFixedSize(900, 450)
 
         MainWindow.pixmap = QtGui.QPixmap()
         MainWindow.image = QtWidgets.QLabel(MainWindow)
@@ -65,6 +65,19 @@ class WindowForm(object):
         MainWindow.view_satskl.setStyleSheet('background-color: #ffcc00')
         MainWindow.view_satskl.setFocusPolicy(QtCore.Qt.NoFocus)
         MainWindow.view_satskl.hide()
+
+        # Поле для адресов
+        # Label для надписи "Адрес:"
+        MainWindow.label_address = QtWidgets.QLabel(MainWindow)
+        MainWindow.label_address.move(660, 10)
+        MainWindow.label_address.resize(240, 30)
+        MainWindow.label_address.setText('Адрес:')
+        # Поле адреса
+        MainWindow.text_address = QtWidgets.QTextEdit(MainWindow)
+        MainWindow.text_address.setReadOnly(True)
+        MainWindow.text_address.move(655, 40)
+        MainWindow.text_address.resize(240, 90)
+        MainWindow.text_address.setStyleSheet('background-color: #ffffff')
 
 
 class ClickableLine(QtWidgets.QLineEdit):

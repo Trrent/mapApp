@@ -29,17 +29,25 @@ class Window(QWidget, WindowForm):
 
     def reset(self):
         self.points = None
+        self.searchLine.clear()
+        self.text_address.setText('')
         self.updateMap()
 
     def search(self):
         s = self.searchLine.text()
         if s:
             coord = get_coords(s)
-            self.object_coords = [float(i) for i in coord.split(',')]
-            self.cur_coords = self.object_coords
-            self.points = [coord + ',pm2rdm']
-            self.resetButton.show()
-            self.updateMap()
+            if coord:
+                self.object_coords = [float(i) for i in coord.split(',')]
+                self.cur_coords = self.object_coords
+                self.points = [coord + ',pm2rdm']
+                self.resetButton.show()
+                self.set_text_address()
+                self.updateMap()
+            else:
+                self.text_address.setText('Ошибка выполнения запроса')
+                self.points = None
+                self.updateMap()
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Up:
@@ -62,9 +70,15 @@ class Window(QWidget, WindowForm):
         self.updateMap()
 
     def updateMap(self):
-        map_img = QByteArray(get_image(' '.join(map(str, self.cur_coords)), self.zoom, self.view, points=self.points))
-        self.pixmap.loadFromData(map_img)
-        self.image.setPixmap(self.pixmap)
+        image = get_image(' '.join(map(str, self.cur_coords)), self.zoom, self.view, points=self.points)
+        if image:
+            map_img = QByteArray(image)
+            self.pixmap.loadFromData(map_img)
+            self.image.setPixmap(self.pixmap)
+        else:
+            self.text_address.setText('Ошибка выполнения запроса')
+            self.points.clear()
+            self.updateMap()
 
     def negative_views(self):
         if self.view_map.isHidden():
@@ -91,10 +105,12 @@ class Window(QWidget, WindowForm):
         self.updateMap()
         self.negative_views()
 
+    def set_text_address(self):
+        self.text_address.setText(get_address(' '.join(map(str, self.cur_coords))))
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = Window()
     window.show()
     sys.exit(app.exec())
-
