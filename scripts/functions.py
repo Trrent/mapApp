@@ -76,7 +76,7 @@ def get_points(*places):
     return map(get_description, places)
 
 
-def get_address(coords: str):
+def get_address(coords: str, postcode: bool):
     geocode_url = "https://geocode-maps.yandex.ru/1.x/"
     params = {"apikey": "40d1649f-0493-4b70-98ba-98533de7710b",
               "geocode": coords.replace(" ", ","),
@@ -84,8 +84,13 @@ def get_address(coords: str):
     response = requests.get(geocode_url, params)
     if response:
         r = response.json()
-        address = \
-            r["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]["metaDataProperty"]["GeocoderMetaData"][
-                "text"]
+        r = r["response"]["GeoObjectCollection"]["featureMember"][0][
+            "GeoObject"]["metaDataProperty"]["GeocoderMetaData"]
+        if postcode and 'postal_code' in r['Address']:
+            address = f"{r['text']}, {r['Address']['postal_code']}"
+        elif postcode:
+            address = r['text'] + ', нет индекса'
+        else:
+            address = r['text']
         return address
     return None

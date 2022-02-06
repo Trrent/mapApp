@@ -33,6 +33,9 @@ class WindowForm(object):
         MainWindow.resetButton.setGeometry(585, 41, 60, 31)
         MainWindow.resetButton.hide()
 
+        MainWindow.postcodeCheck = QtWidgets.QCheckBox('Выводить индекс', MainWindow)
+        MainWindow.postcodeCheck.move(660, 415)
+
         # Вид карты (Схема/Спутник/Гибрид)
         # Кнопка "Вид"
         MainWindow.view_show = QtWidgets.QPushButton(MainWindow)

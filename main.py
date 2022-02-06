@@ -16,6 +16,7 @@ class Window(QWidget, WindowForm):
         self.zoom = 17
         self.points = None
         self.view = 'map'
+        self.postcode = False
         self.setupUi(self)
         self.view_show.clicked.connect(self.negative_views)
         self.view_map.clicked.connect(self.set_view_map)
@@ -24,8 +25,14 @@ class Window(QWidget, WindowForm):
         self.searchButton.clicked.connect(self.search)
         self.clearButton.clicked.connect(self.searchLine.clear)
         self.resetButton.clicked.connect(self.reset)
+        self.postcodeCheck.stateChanged.connect(self.postcodeState)
 
         self.updateMap()
+        self.set_text_address()
+
+    def postcodeState(self, state):
+        self.postcode = True if state == Qt.Checked else False
+        self.set_text_address()
 
     def reset(self):
         self.points = None
@@ -106,7 +113,7 @@ class Window(QWidget, WindowForm):
         self.negative_views()
 
     def set_text_address(self):
-        self.text_address.setText(get_address(' '.join(map(str, self.cur_coords))))
+        self.text_address.setText(get_address(' '.join(map(str, self.cur_coords)), self.postcode))
 
 
 if __name__ == '__main__':
