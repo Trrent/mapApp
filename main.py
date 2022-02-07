@@ -56,6 +56,18 @@ class Window(QWidget, WindowForm):
                 self.points = None
                 self.updateMap()
 
+    def mousePressEvent(self, e: QtGui.QMouseEvent):
+        if e.pos().x() < 650:
+            if e.button() == Qt.LeftButton:
+                x = self.cur_coords[0] + 0.00694 * 2 ** (17 - self.zoom) * (e.pos().x() - 325) / 650
+                y = self.cur_coords[1] - 0.00265 * 2 ** (17 - self.zoom) * (e.pos().y() - 225) / 450
+                self.object_coords = [x, y]
+                self.cur_coords = self.object_coords
+                self.points = [f"{x},{y}" + ',pm2rdm']
+                self.resetButton.show()
+                self.set_text_address()
+                self.updateMap()
+
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Up:
             self.cur_coords[1] = check_coordinates(self.cur_coords[1], 0.00266 * 2 ** (17 - self.zoom), 'y')
