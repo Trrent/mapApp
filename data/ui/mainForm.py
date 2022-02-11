@@ -25,13 +25,19 @@ class WindowForm(object):
 
         MainWindow.searchButton = QtWidgets.QPushButton('Поиск', MainWindow)
         MainWindow.searchButton.setGeometry(525, 10, 60, 31)
+        MainWindow.searchButton.setStyleSheet('background-color: #ffcc00')
 
         MainWindow.clearButton = QtWidgets.QPushButton('Стереть', MainWindow)
         MainWindow.clearButton.setGeometry(585, 10, 60, 31)
+        MainWindow.clearButton.setStyleSheet('background-color: #ffcc00')
 
         MainWindow.resetButton = QtWidgets.QPushButton('Сброс', MainWindow)
         MainWindow.resetButton.setGeometry(585, 41, 60, 31)
+        MainWindow.resetButton.setStyleSheet('background-color: #ffcc00')
         MainWindow.resetButton.hide()
+
+        MainWindow.postcodeCheck = QtWidgets.QCheckBox('Выводить индекс', MainWindow)
+        MainWindow.postcodeCheck.move(660, 415)
 
         # Вид карты (Схема/Спутник/Гибрид)
         # Кнопка "Вид"

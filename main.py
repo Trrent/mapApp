@@ -16,6 +16,7 @@ class Window(QWidget, WindowForm):
         self.zoom = 17
         self.points = None
         self.view = 'map'
+        self.postcode = False
         self.setupUi(self)
         self.view_show.clicked.connect(self.negative_views)
         self.view_map.clicked.connect(self.set_view_map)
@@ -24,24 +25,68 @@ class Window(QWidget, WindowForm):
         self.searchButton.clicked.connect(self.search)
         self.clearButton.clicked.connect(self.searchLine.clear)
         self.resetButton.clicked.connect(self.reset)
+        self.postcodeCheck.stateChanged.connect(self.postcodeState)
 
         self.updateMap()
+        self.set_text_address()
+
+    def postcodeState(self, state):
+        self.postcode = True if state == Qt.Checked else False
+        if self.text_address.toPlainText():
+            self.set_text_address()
 
     def reset(self):
         self.points = None
+        self.searchLine.clear()
         self.text_address.setText('')
+        self.resetButton.hide()
         self.updateMap()
 
     def search(self):
         s = self.searchLine.text()
         if s:
             coord = get_coords(s)
-            self.object_coords = [float(i) for i in coord.split(',')]
-            self.cur_coords = self.object_coords
-            self.points = [coord + ',pm2rdm']
-            self.resetButton.show()
-            self.set_text_address()
-            self.updateMap()
+            if coord:
+                self.object_coords = [float(i) for i in coord.split(',')]
+                self.cur_coords = self.object_coords
+                self.points = [coord + ',pm2rdm']
+                self.resetButton.show()
+                self.set_text_address()
+                self.updateMap()
+            else:
+                self.text_address.setText('Ошибка выполнения запроса')
+                self.points = None
+                self.updateMap()
+
+    def mousePressEvent(self, e: QtGui.QMouseEvent):
+        if e.pos().x() < 650:
+            if e.button() == Qt.LeftButton:
+                x = self.cur_coords[0] + 0.00694 * 2 ** (17 - self.zoom) * (e.pos().x() - 325) / 650
+                y = self.cur_coords[1] - 0.00265 * 2 ** (17 - self.zoom) * (e.pos().y() - 225) / 450
+                self.object_coords = [x, y]
+                self.cur_coords = self.object_coords
+                self.points = [f"{x},{y}" + ',pm2rdm']
+                self.resetButton.show()
+                self.set_text_address()
+                self.updateMap()
+            elif e.button() == Qt.RightButton:
+                x = self.cur_coords[0] + 0.00694 * 2 ** (17 - self.zoom) * (e.pos().x() - 325) / 650
+                y = self.cur_coords[1] - 0.00265 * 2 ** (17 - self.zoom) * (e.pos().y() - 225) / 450
+                res = get_organization(f'{str(x)},{str(y)}')
+                if res is not None:
+                    res = list(map(float, res.split(',')))
+                    s = lonlat_distance(res, [x, y])
+                    if s > 50:
+                        self.reset()
+                        return
+                    self.object_coords = res
+                    self.cur_coords = self.object_coords
+                    self.points = [f"{res[0]},{res[1]},pm2rdm"]
+                    self.resetButton.show()
+                    self.set_text_address()
+                    self.updateMap()
+                else:
+                    self.reset()
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Up:
@@ -64,9 +109,15 @@ class Window(QWidget, WindowForm):
         self.updateMap()
 
     def updateMap(self):
-        map_img = QByteArray(get_image(' '.join(map(str, self.cur_coords)), self.zoom, self.view, points=self.points))
-        self.pixmap.loadFromData(map_img)
-        self.image.setPixmap(self.pixmap)
+        image = get_image(' '.join(map(str, self.cur_coords)), self.zoom, self.view, points=self.points)
+        if image:
+            map_img = QByteArray(image)
+            self.pixmap.loadFromData(map_img)
+            self.image.setPixmap(self.pixmap)
+        else:
+            self.text_address.setText('Ошибка выполнения запроса')
+            self.points.clear()
+            self.updateMap()
 
     def negative_views(self):
         if self.view_map.isHidden():
@@ -94,11 +145,16 @@ class Window(QWidget, WindowForm):
         self.negative_views()
 
     def set_text_address(self):
-        self.text_address.setText(get_address(' '.join(map(str, self.cur_coords))))
+        self.text_address.setText(get_address(' '.join(map(str, self.cur_coords)), self.postcode))
+
+
+def except_hook(cls, exception, traceback):
+    sys.__excepthook__(cls, exception, traceback)
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = Window()
     window.show()
+    sys.excepthook = except_hook
     sys.exit(app.exec())
