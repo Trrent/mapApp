@@ -111,7 +111,6 @@ def get_organization(coords: str):
               "format": "json"}
     request = requests.get(address, params)
     request = request.json()
-    print(request)
     if len(request["features"]) != 0:
         coordss = request["features"][-1]["geometry"]["coordinates"]
         return f'{coordss[0]},{coordss[1]}'
