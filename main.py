@@ -67,6 +67,23 @@ class Window(QWidget, WindowForm):
                 self.resetButton.show()
                 self.set_text_address()
                 self.updateMap()
+            elif e.button() == Qt.RightButton:
+                x = self.cur_coords[0] + 0.00694 * 2 ** (17 - self.zoom) * (e.pos().x() - 325) / 650
+                y = self.cur_coords[1] - 0.00265 * 2 ** (17 - self.zoom) * (e.pos().y() - 225) / 450
+                org, res = get_organization(f'{str(x)},{str(y)}')
+                if res is not None:
+                    res = list(map(float, res.split(',')))
+                    s = lonlat_distance(res, [x, y])
+                    if s > 50:
+                        return self.reset()
+                    self.object_coords = res
+                    self.cur_coords = self.object_coords
+                    self.points = [f"{res[0]},{res[1]},pm2rdm"]
+                    self.resetButton.show()
+                    self.set_text_address(org)
+                    self.updateMap()
+                else:
+                    self.reset()
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Up:
@@ -124,8 +141,11 @@ class Window(QWidget, WindowForm):
         self.updateMap()
         self.negative_views()
 
-    def set_text_address(self):
-        self.text_address.setText(get_address(' '.join(map(str, self.cur_coords)), self.postcode))
+    def set_text_address(self, message=None):
+        if message is not None:
+            self.text_address.setText(message)
+        else:
+            self.text_address.setText(get_address(' '.join(map(str, self.cur_coords)), self.postcode))
 
 
 if __name__ == '__main__':

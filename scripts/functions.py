@@ -1,4 +1,5 @@
 import requests
+import math
 
 
 def check_response(response):
@@ -94,3 +95,37 @@ def get_address(coords: str, postcode: bool):
             address = r['text']
         return address
     return None
+
+
+def get_organization(coords: str):
+    address = "https://search-maps.yandex.ru/v1/"
+    coords123 = list(map(float, coords.split(',')))
+    params = {"apikey": "dda3ddba-c9ea-4ead-9010-f43fbc15c6e3",
+              "text": "Организация",
+              "lang": "ru_RU",
+              "type": "biz",
+              "ll": f"{coords123[0]},{coords123[1]}",
+              "spn": "0.003,0.003",
+              "results": "1",
+              "rspn": "1",
+              "format": "json"}
+    request = requests.get(address, params)
+    request = request.json()
+    print(request)
+    if request["properties"]["ResponseMetaData"]["SearchResponse"]["found"] > 0:
+        organization = request["features"][0]["properties"]["name"]
+        coords = request["features"][0]["geometry"]["coordinates"]
+        return organization, f'{coords[0]},{coords[1]}'
+    return None, None
+
+
+def lonlat_distance(a, b):
+    degree_to_meters_factor = 111 * 1000
+    a_lon, a_lat = a
+    b_lon, b_lat = b
+    radians_lattitude = math.radians((a_lat + b_lat) / 2.)
+    lat_lon_factor = math.cos(radians_lattitude)
+    dx = abs(a_lon - b_lon) * degree_to_meters_factor * lat_lon_factor
+    dy = abs(a_lat - b_lat) * degree_to_meters_factor
+    distance = math.sqrt(dx * dx + dy * dy)
+    return distance
